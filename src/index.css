@@ -39,15 +39,15 @@ button {
   margin: 5px;
   min-height: 1vh;
   min-width: 10vh;
-  border-radius: 5px;
-  border: 1px solid #dddddd;
+  /*border-radius: 5px;*/
+  /*border: 1px solid #dddddd;*/
   background: transparent;
-  /*color: #808080;*/
+  color: #ffff;
   cursor: pointer;
 }
 
 button:hover {
-  color: darkblue;
-  text-transform: uppercase;
-   /*text-decoration: underline;*/
+  /*color: darkblue;*/
+  /*text-transform: uppercase;*/
+   text-decoration: underline;
 }

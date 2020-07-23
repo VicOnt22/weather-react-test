@@ -9,13 +9,13 @@ import {DataCityFetchRefine} from "./components/reactredux/DataCityFetchRefine";
 class App extends Component {
   render() {
     return (
-        <Provider store={store}>
+        // <Provider store={store}>
         <div className="App">
         <header className="App-header">         <img src={logo} className="App-logo" alt="logo" />
         <DataCityFetchRefine/>
         </header>
         </div>
-        </Provider>
+        // </Provider>
     );
   }
 }

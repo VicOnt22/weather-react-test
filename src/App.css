@@ -43,6 +43,7 @@
   display: flex;
   overflow: hidden;
   flex-wrap: wrap;
+  justify-content: space-evenly;
 }
 
 .card {
@@ -74,7 +75,8 @@
 .card {
   padding: 0.5em;
   box-sizing: border-box;
-  min-width: 22vh;
+  min-width: 10vh;
+  max-width: 15vh;
 }
 
 /* Pure style purpose */
@@ -144,12 +146,36 @@ ul.city {
 /*}*/
 
 button {
-  background-color: antiquewhite;
+  background-color: darkred;
   font-weight: 700;
+  min-width: 15vh;
+  max-width: 25vh;
 }
+
+.button-apply{
+  display: flex;
+  flex-wrap: nowrap;
+  /*align-items: flex-start;*/
+  justify-content: flex-end;
+
+}
+
 .current-pager-page{
   text-transform: uppercase;
   font-size: large;
   font-weight: bolder;
   color: #61dafb;
+}
+
+.card-wrapper{
+  margin-right: 20px;
+  margin-left: 20px;
+  width: 80%;
+ }
+
+.select-city {
+  width: 100%;
+  padding-top: 0.5%;
+  padding-bottom: 0.5%;
+  font-size: x-large;
 }

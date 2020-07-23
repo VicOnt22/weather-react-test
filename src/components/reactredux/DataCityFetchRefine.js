@@ -67,31 +67,30 @@ export const DataCityFetchRefine = () => {
     //     )
     // }
 
-    const renderInputCityForm = () => {
+    const renderSelectCityForm = () => {
         return (
             <form onSubmit={handleClick}>
                 {/*<input type="text" placeholder = "City (default: Toronto)" value={id} onChange={e => setId(e.target.value.substr(0, 30)) }/>*/}
-                <select value={currCity} value={id} onChange={e => setId(e.target.value.substr(0, 30))}>
+                <select className='select-city' value={currCity} value={id} onChange={e => setId(e.target.value.substr(0, 30))}>
                     <option name="Toronto">Toronto</option>
                     <option name="Montreal">Montreal</option>
                     <option name="Vancouver">Vancouver</option>
                     <option name="Montreal">Edmonton</option>
                     <option name="Whitehorse">Whitehorse</option>
                 </select>
-                <button type="submit" >Apply</button>
+                {/*<button type="submit" >Apply</button>*/}
             </form>
         )
     }
 
-    // const options = [
-    //     { value: 'Toronto', label: 'Toronto' },
-    //     { value: 'Montreal', label: 'Montreal' },
-    //     { value: 'Vancouver', label: 'Vancouver' }
-    // ]
-    //
-    // const CityDropdown = () => (
-    //     <Select options={options} />
-    // )
+    const renderApplyButton = () => {
+        return (
+            <form className='button-apply' onSubmit={handleClick}>
+                {/*<input type="text" placeholder = "City (default: Toronto)" value={id} onChange={e => setId(e.target.value.substr(0, 30)) }/>*/}
+                <button className='button-bottom-apply' type="submit" >Apply</button>
+            </form>
+        )
+    }
 
     const renderForecast = () => {
 
@@ -121,12 +120,12 @@ export const DataCityFetchRefine = () => {
     }
 
     return (
-        <div>
+        <div className='card-wrapper'>
            <h4><label>Canadian City Weather</label></h4>
-            {/*{CityDropdown()}*/}
-            {renderInputCityForm()}
+            {renderSelectCityForm()}
             {renderCityError()}
             {renderForecast()}
+            {renderApplyButton()}
         </div>
     )
 
