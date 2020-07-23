@@ -1,5 +1,10 @@
 .App {
   text-align: center;
+  font-family: 'Open Sans';
+}
+
+body {
+  font-family: 'Open Sans';
 }
 
 .App-logo {
@@ -146,10 +151,15 @@ ul.city {
 /*}*/
 
 button {
-  background-color: darkred;
-  font-weight: 700;
+  background-color: #cf262a;
+  font-weight: normal;
+  width: 20vh;
   min-width: 15vh;
   max-width: 25vh;
+  font-size: 28px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border: none;
 }
 
 .button-apply{
@@ -168,14 +178,32 @@ button {
 }
 
 .card-wrapper{
+  font-family: 'Open Sans';
   margin-right: 20px;
   margin-left: 20px;
   width: 80%;
+  max-width: 887px;
+  max-height: 543px;
  }
 
-.select-city {
+select.select-city {
+  font-family: 'Open Sans';
   width: 100%;
-  padding-top: 0.5%;
-  padding-bottom: 0.5%;
-  font-size: x-large;
+  padding: 0.5%;
+  font-size: 28px;
+}
+.weather-img img{
+  width: 95%;
+  /*margin-left: 10%;*/
+}
+
+.weather-date{
+  font-weight: bold;
+  font-size: 19px;
+}
+
+/* Point the arrow upwards when the select box is open (active): */
+select.select-city.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
 }

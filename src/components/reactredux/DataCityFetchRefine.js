@@ -1,13 +1,12 @@
-import React, {useState, useEffect, Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from "axios";
-import Select from 'react-select';
 
 
 export const DataCityFetchRefine = () => {
 
     const [forecast, setForecast] = useState([])
-    const [id, setId] = useState('')
-    const [idFromButtonClick, setIdFromButtonClick] = useState('')
+    const [id, setId] = useState('Toronto')
+    const [idFromButtonClick, setIdFromButtonClick] = useState('Toronto')
     const [err, setErrMsg] = useState(false)
     const [currCity, setCurrentCity] = useState('')
     const [postError, setPostError] = useState({})
@@ -16,10 +15,16 @@ export const DataCityFetchRefine = () => {
 
     // For the empty city submission set default City to Toronto
     const handleClick = (e) =>{ e.preventDefault();
+        // id ? setId(id) : setId('Toronto')
         id ? setIdFromButtonClick(id) : setIdFromButtonClick('Toronto')
     }
-    const handleRefineClick = (event) =>{
-        event.preventDefault();
+
+    const handleChange = (e) =>{
+
+        id ? setCurrentCity(id) : setCurrentCity(id)
+        id ? setIdFromButtonClick(id) : setIdFromButtonClick('Toronto')
+        handleClick(e)
+        e.preventDefault();
     }
 
     useEffect(() => {
@@ -33,7 +38,7 @@ export const DataCityFetchRefine = () => {
             axios.get(weatherbitUrl)
                 .then(result => {
                     let resultarray = result.data.data;
-                    // console.log('ResultArray ', result.data)
+                    console.log('ResultArray ', resultarray)
                     setForecast(resultarray);
                     setIsLoading(false);
                 })
@@ -45,7 +50,8 @@ export const DataCityFetchRefine = () => {
 
 
         }
-    }, [idFromButtonClick, err, currCity])
+    // }, [idFromButtonClick, err, id, idFromButtonClick, currCity, selectedOption])
+    }, [err, id, idFromButtonClick])
 
 
     const cityError = () => {
@@ -67,26 +73,39 @@ export const DataCityFetchRefine = () => {
     //     )
     // }
 
+
     const renderSelectCityForm = () => {
         return (
-            <form onSubmit={handleClick}>
-                {/*<input type="text" placeholder = "City (default: Toronto)" value={id} onChange={e => setId(e.target.value.substr(0, 30)) }/>*/}
-                <select className='select-city' value={currCity} value={id} onChange={e => setId(e.target.value.substr(0, 30))}>
+
+            <form>
+            {/* <form onClick={handleChange}> */}
+            {/* <form onClick={handleClick}> */}
+                <select className='select-city' value={id} onChange={e =>  setId(e.target.value.substr(0, 15))}>
                     <option name="Toronto">Toronto</option>
                     <option name="Montreal">Montreal</option>
                     <option name="Vancouver">Vancouver</option>
                     <option name="Montreal">Edmonton</option>
                     <option name="Whitehorse">Whitehorse</option>
                 </select>
-                {/*<button type="submit" >Apply</button>*/}
             </form>
         )
     }
 
+    // const options = () => {
+    //  return (
+    //      [
+    //         {value: 'Toronto', label: 'Toronto'},
+    //         {value: 'Montreal', label: 'Montreal'},
+    //         {value: 'Vancouver', label: 'Vancouver'}
+    //     ]
+    //  )
+    // }
+
+
+
     const renderApplyButton = () => {
         return (
             <form className='button-apply' onSubmit={handleClick}>
-                {/*<input type="text" placeholder = "City (default: Toronto)" value={id} onChange={e => setId(e.target.value.substr(0, 30)) }/>*/}
                 <button className='button-bottom-apply' type="submit" >Apply</button>
             </form>
         )
@@ -98,10 +117,10 @@ export const DataCityFetchRefine = () => {
             <div className='Gallery' aria-label="Weather Forecast">
                 {forecast.map(dayWeather => <div  className='card' key={dayWeather.moonrise_ts}>
                     <div className='place' aria-label="Next Day">
-                        <div>{getDayName(dayWeather.datetime)}</div>
-                        <div>{getDateMonth(dayWeather.datetime)}</div>
-                        <div>
-                            <img src={process.env.PUBLIC_URL + '/assets/icons/' + dayWeather.weather.icon +'.png'} />
+                        <div className='weather-date'>{getDayName(dayWeather.datetime)}</div>
+                        <div className='weather-date'>{getDateMonth(dayWeather.datetime)}</div>
+                        <div className='weather-img'>
+                            <img src={process.env.PUBLIC_URL + '/assets/icons/' + dayWeather.weather.icon +'.png'} alt={dayWeather.weather.description} />
                         </div>
                         <div className='place-subtitle'>{Math.round(dayWeather.temp)}&#176;C </div>
                     </div>
@@ -122,6 +141,7 @@ export const DataCityFetchRefine = () => {
     return (
         <div className='card-wrapper'>
            <h4><label>Canadian City Weather</label></h4>
+
             {renderSelectCityForm()}
             {renderCityError()}
             {renderForecast()}
