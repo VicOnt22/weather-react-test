@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Component} from 'react';
 import axios from "axios";
+import Select from 'react-select';
 
 
 export const DataCityFetchRefine = () => {
@@ -57,21 +58,45 @@ export const DataCityFetchRefine = () => {
 
     const renderCityError = () => { return(<p> {err ? err ? cityError() : '': ''} </p> ) }
 
+    // const renderInputCityForm = () => {
+    //     return (
+    //         <form onSubmit={handleClick}>
+    //             <input type="text" placeholder = "City (default: Toronto)" value={id} onChange={e => setId(e.target.value.substr(0, 30)) }/>
+    //             <button type="submit" >Search {id}</button>
+    //         </form>
+    //     )
+    // }
+
     const renderInputCityForm = () => {
         return (
             <form onSubmit={handleClick}>
-                <input type="text" placeholder = "City (default: Toronto)" value={id} onChange={e => setId(e.target.value.substr(0, 30)) }/>
-                <button type="submit" >Search {id}</button>
+                {/*<input type="text" placeholder = "City (default: Toronto)" value={id} onChange={e => setId(e.target.value.substr(0, 30)) }/>*/}
+                <select value={currCity} value={id} onChange={e => setId(e.target.value.substr(0, 30))}>
+                    <option name="Toronto">Toronto</option>
+                    <option name="Montreal">Montreal</option>
+                    <option name="Vancouver">Vancouver</option>
+                    <option name="Montreal">Edmonton</option>
+                    <option name="Whitehorse">Whitehorse</option>
+                </select>
+                <button type="submit" >Apply</button>
             </form>
         )
     }
 
+    // const options = [
+    //     { value: 'Toronto', label: 'Toronto' },
+    //     { value: 'Montreal', label: 'Montreal' },
+    //     { value: 'Vancouver', label: 'Vancouver' }
+    // ]
+    //
+    // const CityDropdown = () => (
+    //     <Select options={options} />
+    // )
 
     const renderForecast = () => {
 
         return(
             <div className='Gallery' aria-label="Weather Forecast">
-
                 {forecast.map(dayWeather => <div  className='card' key={dayWeather.moonrise_ts}>
                     <div className='place' aria-label="Next Day">
                         <div>{getDayName(dayWeather.datetime)}</div>
@@ -98,6 +123,7 @@ export const DataCityFetchRefine = () => {
     return (
         <div>
            <h4><label>Canadian City Weather</label></h4>
+            {/*{CityDropdown()}*/}
             {renderInputCityForm()}
             {renderCityError()}
             {renderForecast()}
