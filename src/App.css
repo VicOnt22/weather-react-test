@@ -52,18 +52,18 @@
 
 @media screen and (min-width: 967px) and (max-width: 1127px) {
   .card {
-    flex-basis: calc(100% / 3);
+    flex-basis: calc(100% / 4);
   }
 }
 
 @media screen and (max-width: 967px) {
   .card {
-    flex-basis: calc(100% / 2);
+    flex-basis: calc(100% / 3);
   }
 }
 @media screen and (max-width: 480px) {
   .card {
-    flex-basis: calc(100% / 1);
+    flex-basis: calc(100% / 2);
   }
 }
 
@@ -96,6 +96,11 @@ span.place-subtitle:hover {
   margin: 4px 0;
   text-align: left;
   font-size: medium;
+
+  display: flex;
+  /*flex-wrap: wrap;*/
+  justify-content: space-evenly;
+
 }
 
 .App {

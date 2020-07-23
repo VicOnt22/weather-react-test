@@ -4,25 +4,14 @@ import axios from "axios";
 
 export const DataCityFetchRefine = () => {
 
-    const itemsPerPagerPage = process.env.REACT_APP_ITEMS_PER_PAGER_PAGE
-
-    const [post, setPost] = useState([])
+    const [forecast, setForecast] = useState([])
     const [id, setId] = useState('')
     const [idFromButtonClick, setIdFromButtonClick] = useState('')
     const [err, setErrMsg] = useState(false)
-    const [currPagerPage, setCurrPagerPage] = useState(1)
-    const [totalEntries, setTotalEntries] = useState(0)
     const [currCity, setCurrentCity] = useState('')
     const [postError, setPostError] = useState({})
-    const [refine, setRefine] = useState('')
-
     const [isLoading, setIsLoading] = useState(true);
-    const [weather, setWeather] = useState({});
     const [error, setError] = useState({});
-    const [city, setCity] = useState('Toronto');
-    const [country, setCountry] = useState('CA');
-
-
 
     // For the empty city submission set default City to Toronto
     const handleClick = (e) =>{ e.preventDefault();
@@ -33,62 +22,24 @@ export const DataCityFetchRefine = () => {
     }
 
     useEffect(() => {
-        let openTableUrl = process.env.REACT_APP_OPEN_TABLE_URL
         let weatherbitUrl = process.env.REACT_APP_WEATHERBIT_URL
         let weatherbitKey = process.env.REACT_APP_WEATHERBIT_KEY
 
         if (idFromButtonClick) {
 
-            if (currCity !== idFromButtonClick) {
-
-                openTableUrl = `${openTableUrl}/restaurants?city=${idFromButtonClick}&per_page=${itemsPerPagerPage}&page=1`
-                console.log('Request1a ', openTableUrl)
-                weatherbitUrl = `${weatherbitUrl}=${idFromButtonClick},CA&days=7&key=${weatherbitKey}`
-                console.log('Request1 ', weatherbitUrl)
-            }else {
-                openTableUrl = `${openTableUrl}/restaurants?city=${idFromButtonClick}&per_page=${itemsPerPagerPage}&page=1`
-                weatherbitUrl = `${weatherbitUrl}=${idFromButtonClick},CA&days=7&key=${weatherbitKey}`
-                console.log('Request2 ', weatherbitUrl)
-                console.log('Request2a ', openTableUrl)
-            }
-
-            axios.get(openTableUrl)
-                .then(resp => {
-                    let nextstring = refine;
-                    setPost(resp.data.restaurants)
-                    setTotalEntries(resp.data.total_entries)
-                    setCurrentCity(resp.data.restaurants[0]['city'])
-                })
-                .catch(error => {
-                    setErrMsg(true)
-                    console.log('State err', err)
-                    setPostError(error)
-                })
+                weatherbitUrl = `${weatherbitUrl}=${idFromButtonClick},CA&days=5&key=${weatherbitKey}`
 
             axios.get(weatherbitUrl)
                 .then(result => {
-                    // console.log('Result ', result.data)
-                    let nextstring = refine;
-                    // setPost(result.data)
-
-                    result = result.data;
-                    setWeather({
-                        temperature: result.data[0].temp,
-                        city: result.city_name,
-                        country: result.country_code,
-                        icon: result.data[0].weather.icon,
-                        code: result.data[0].weather.code,
-                        description: result.data[0].weather.description,
-                        // forecastdays: result.data, //this is an array
-                        valid_date: result.data[0].valid_date
-                    });
-                    console.log('weather ', weather)
+                    let resultarray = result.data.data;
+                    // console.log('ResultArray ', result.data)
+                    setForecast(resultarray);
                     setIsLoading(false);
                 })
-                .catch(error => {
+                .catch(err => {
                     setErrMsg(true)
-                    console.log('State err', error)
-                    setError(error)
+                    console.log('State err', err)
+                    setError(err)
                 })
 
 
@@ -116,57 +67,46 @@ export const DataCityFetchRefine = () => {
     }
 
 
+    const renderForecast = () => {
 
-    const renderRestaurants =() =>{
-        let filteredRestaurants = post.filter(
-            (restaurant) => {
-                let foundRestaurants = (restaurant.name.toLowerCase().indexOf(refine.toLowerCase()) !== -1)
-                    || (restaurant.address.toLowerCase().indexOf(refine.toLowerCase()) !== -1)
-                    || (restaurant.area.toLowerCase().indexOf(refine.toLowerCase()) !== -1)
-                return foundRestaurants
-            }
-        )
         return(
-            <div className='Gallery' aria-label="Restaurants Information">
-                { filteredRestaurants.map(restaurant => <div  className='card' key={restaurant.id}>
-                    <ul className='place' aria-label="Next Restaurant">
-                        <li className='place-subtitle'>Name: {restaurant.name} </li>
-                        <li>Address: {restaurant.address}</li>
-                        <li>Price: {restaurant.price}</li>
-                        <li>Area: {restaurant.area}</li>
-                    </ul>
+            <div className='Gallery' aria-label="Weather Forecast">
+
+                {forecast.map(dayWeather => <div  className='card' key={dayWeather.moonrise_ts}>
+                    <div className='place' aria-label="Next Day">
+                        <div>{getDayName(dayWeather.datetime)}</div>
+                        <div>{getDateMonth(dayWeather.datetime)}</div>
+                        <div>
+                            <img src={process.env.PUBLIC_URL + '/assets/icons/' + dayWeather.weather.icon +'.png'} />
+                        </div>
+                        <div className='place-subtitle'>{Math.round(dayWeather.temp)}&#176;C </div>
+                    </div>
                 </div>)
                 }
+
             </div>
         )
     }
 
-    const renderInputRefineForm = () => {
-        return (
-            <React.Fragment>
-            {
-                <form onSubmit={handleRefineClick}>
-                     <input type="text" placeholder = "Name, Address or Area" value={refine} onChange={event => {
-                        setRefine(event.target.value.substr(0, 30))
-                     }}/>
-                     <button type="submit" > Refine </button>
-                </form> }
-            </React.Fragment>
-        )
+    function getDayName(date) {
+        return new Date(date).toLocaleString('en', { weekday: 'long' });
+    }
+    function getDateMonth(date) {
+        return (new Date(date).toLocaleString('en', { month: 'short' })  + ' ' + new Date(date).toLocaleString('en', { day: 'numeric' }));
     }
 
     return (
         <div>
-           <h4><label>City Weather</label></h4>
+           <h4><label>Canadian City Weather</label></h4>
             {renderInputCityForm()}
-            {renderInputRefineForm()}
             {renderCityError()}
-            {renderRestaurants()}
+            {renderForecast()}
         </div>
     )
 
 
 }
+
 
 
 
