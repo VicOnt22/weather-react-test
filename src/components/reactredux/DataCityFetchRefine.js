@@ -1,14 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {useDispatch} from "react-redux";
 import axios from "axios";
-import {saveCity, refineCity} from "../../aredux";
-import {HookCityContainer} from "../hooks/HookCityContainer";
 
 
 export const DataCityFetchRefine = () => {
 
-    const dispatch = useDispatch()
     const itemsPerPagerPage = process.env.REACT_APP_ITEMS_PER_PAGER_PAGE
+
     const [post, setPost] = useState([])
     const [id, setId] = useState('')
     const [idFromButtonClick, setIdFromButtonClick] = useState('')
@@ -18,56 +15,86 @@ export const DataCityFetchRefine = () => {
     const [currCity, setCurrentCity] = useState('')
     const [postError, setPostError] = useState({})
     const [refine, setRefine] = useState('')
-    const [refineValue, setRefineValue] = useState('')
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [weather, setWeather] = useState({});
+    const [error, setError] = useState({});
+    const [city, setCity] = useState('Toronto');
+    const [country, setCountry] = useState('CA');
+
+
 
     // For the empty city submission set default City to Toronto
     const handleClick = (e) =>{ e.preventDefault();
         id ? setIdFromButtonClick(id) : setIdFromButtonClick('Toronto')
     }
     const handleRefineClick = (event) =>{
-               refine ? setRefineValue(refine) : setRefineValue('')
         event.preventDefault();
     }
 
     useEffect(() => {
-        var openTableUrl = process.env.REACT_APP_OPEN_TABLE_URL
+        let openTableUrl = process.env.REACT_APP_OPEN_TABLE_URL
+        let weatherbitUrl = process.env.REACT_APP_WEATHERBIT_URL
+        let weatherbitKey = process.env.REACT_APP_WEATHERBIT_KEY
+
         if (idFromButtonClick) {
-            if (currCity !== idFromButtonClick && totalEntries <= itemsPerPagerPage) {
+
+            if (currCity !== idFromButtonClick) {
+
                 openTableUrl = `${openTableUrl}/restaurants?city=${idFromButtonClick}&per_page=${itemsPerPagerPage}&page=1`
-            }else{
-                openTableUrl = `${openTableUrl}/restaurants?city=${idFromButtonClick}&per_page=${itemsPerPagerPage}&page=${currPagerPage}`
+                console.log('Request1a ', openTableUrl)
+                weatherbitUrl = `${weatherbitUrl}=${idFromButtonClick},CA&days=7&key=${weatherbitKey}`
+                console.log('Request1 ', weatherbitUrl)
+            }else {
+                openTableUrl = `${openTableUrl}/restaurants?city=${idFromButtonClick}&per_page=${itemsPerPagerPage}&page=1`
+                weatherbitUrl = `${weatherbitUrl}=${idFromButtonClick},CA&days=7&key=${weatherbitKey}`
+                console.log('Request2 ', weatherbitUrl)
+                console.log('Request2a ', openTableUrl)
             }
+
             axios.get(openTableUrl)
                 .then(resp => {
                     let nextstring = refine;
                     setPost(resp.data.restaurants)
-                    setCurrPagerPage(resp.data.current_page)
                     setTotalEntries(resp.data.total_entries)
                     setCurrentCity(resp.data.restaurants[0]['city'])
-                    dispatch(saveCity(post))
-                    dispatch(refineCity(nextstring))
                 })
                 .catch(error => {
                     setErrMsg(true)
-                    // console.log('State err', err)
+                    console.log('State err', err)
                     setPostError(error)
                 })
-        }
-    }, [idFromButtonClick, err, currPagerPage, currCity])
 
-    // pager calculations
-    const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(totalEntries/itemsPerPagerPage); i++) {
-        pageNumbers.push(i);
-    }
-    const handlePagerNextClick = (event) => { setCurrPagerPage(currPagerPage + 1)
-        dispatch(refineCity(refine)) }
-    const handlePagerPreviousClick = (event) => { setCurrPagerPage(currPagerPage > 1? currPagerPage - 1 : 1)
-        dispatch(refineCity(refine)) }
-    const handlePagerLastClick = (event) => { setCurrPagerPage(currPagerPage >= 1? pageNumbers.length : 1)
-        dispatch(refineCity(refine)) }
-    const handlePagerFirstClick = (event) => { setCurrPagerPage(currPagerPage > 1 ? 1 : 1)
-        dispatch(refineCity(refine)) }
+            axios.get(weatherbitUrl)
+                .then(result => {
+                    // console.log('Result ', result.data)
+                    let nextstring = refine;
+                    // setPost(result.data)
+
+                    result = result.data;
+                    setWeather({
+                        temperature: result.data[0].temp,
+                        city: result.city_name,
+                        country: result.country_code,
+                        icon: result.data[0].weather.icon,
+                        code: result.data[0].weather.code,
+                        description: result.data[0].weather.description,
+                        // forecastdays: result.data, //this is an array
+                        valid_date: result.data[0].valid_date
+                    });
+                    console.log('weather ', weather)
+                    setIsLoading(false);
+                })
+                .catch(error => {
+                    setErrMsg(true)
+                    console.log('State err', error)
+                    setError(error)
+                })
+
+
+        }
+    }, [idFromButtonClick, err, currCity])
+
 
     const cityError = () => {
         if (postError.message === "Cannot read property 'city' of undefined") {
@@ -77,24 +104,7 @@ export const DataCityFetchRefine = () => {
         }
     }
 
-    const renderPagerFirst = () => { return (<span className='place-subtitle' aria-label="First page" onClick={handlePagerFirstClick}> 1st ... </span>)}
-    const renderPagerNext = () => { return (<span className='place-subtitle' aria-label="Next" onClick={handlePagerNextClick}>  »Next  </span>)}
-    const renderPagerPrevious = () => { return (<span className='place-subtitle' aria-label="Previous" onClick={handlePagerPreviousClick}> Prev«  </span>)}
-    const renderPagerLast = () => { return (<span className='place-subtitle' aria-label="Last page" onClick={handlePagerLastClick}> ... Last {pageNumbers.length} </span>)}
-    const renderCurrentPageNumber = () => { return (<span className='current-pager-page' aria-label="Current page"> &nbsp; Page {currPagerPage} &nbsp; </span>)}
-    const renderCityError = () => { return(<p> {pageNumbers.length < 1 ? err ? cityError() : '': ''} </p> ) }
-
-    const renderPagerParagraph = () => {
-        return(
-            <p aria-label="Restaurants Pagination">
-                {currPagerPage > 1 ? renderPagerFirst() : ''}
-                {currPagerPage > 1 ? renderPagerPrevious() : ''}
-                {pageNumbers.length > 1 ? renderCurrentPageNumber(): ''}
-                {currPagerPage < pageNumbers.length ? renderPagerNext() : ''}
-                {currPagerPage < pageNumbers.length ? renderPagerLast(): ''}
-            </p>
-        )
-    }
+    const renderCityError = () => { return(<p> {err ? err ? cityError() : '': ''} </p> ) }
 
     const renderInputCityForm = () => {
         return (
@@ -104,6 +114,9 @@ export const DataCityFetchRefine = () => {
             </form>
         )
     }
+
+
+
     const renderRestaurants =() =>{
         let filteredRestaurants = post.filter(
             (restaurant) => {
@@ -131,26 +144,24 @@ export const DataCityFetchRefine = () => {
     const renderInputRefineForm = () => {
         return (
             <React.Fragment>
-            {pageNumbers.length >= 1 ? (
+            {
                 <form onSubmit={handleRefineClick}>
                      <input type="text" placeholder = "Name, Address or Area" value={refine} onChange={event => {
                         setRefine(event.target.value.substr(0, 30))
-                        dispatch(refineCity(event.target.value.substr(0, 30)))}}/>
+                     }}/>
                      <button type="submit" > Refine </button>
-                </form>) : '' }
+                </form> }
             </React.Fragment>
         )
     }
 
     return (
         <div>
-           <h4><label>Search City Restaurants</label></h4>
+           <h4><label>City Weather</label></h4>
             {renderInputCityForm()}
             {renderInputRefineForm()}
             {renderCityError()}
-            {renderPagerParagraph()}
             {renderRestaurants()}
-            {renderPagerParagraph()}
         </div>
     )
 
