@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from "axios";
 
-
 export const DataCityFetchRefine = () => {
 
     const [forecast, setForecast] = useState([])
@@ -13,14 +12,11 @@ export const DataCityFetchRefine = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState({});
 
-    // For the empty city submission set default City to Toronto
     const handleClick = (e) =>{ e.preventDefault();
-        // id ? setId(id) : setId('Toronto')
         id ? setIdFromButtonClick(id) : setIdFromButtonClick('Toronto')
     }
 
     const handleChange = (e) =>{
-
         id ? setCurrentCity(id) : setCurrentCity(id)
         id ? setIdFromButtonClick(id) : setIdFromButtonClick('Toronto')
         handleClick(e)
@@ -32,9 +28,7 @@ export const DataCityFetchRefine = () => {
         let weatherbitKey = process.env.REACT_APP_WEATHERBIT_KEY
 
         if (idFromButtonClick) {
-
-                weatherbitUrl = `${weatherbitUrl}=${idFromButtonClick},CA&days=5&key=${weatherbitKey}`
-
+            weatherbitUrl = `${weatherbitUrl}=${idFromButtonClick},CA&days=5&key=${weatherbitKey}`
             axios.get(weatherbitUrl)
                 .then(result => {
                     let resultarray = result.data.data;
@@ -47,12 +41,8 @@ export const DataCityFetchRefine = () => {
                     console.log('State err', err)
                     setError(err)
                 })
-
-
         }
-    // }, [idFromButtonClick, err, id, idFromButtonClick, currCity, selectedOption])
     }, [err, id, idFromButtonClick])
-
 
     const cityError = () => {
         if (postError.message === "Cannot read property 'city' of undefined") {
@@ -61,18 +51,7 @@ export const DataCityFetchRefine = () => {
             return (<span aria-label="Error or Page Not Found">{postError.message}</span>)
         }
     }
-
     const renderCityError = () => { return(<p> {err ? err ? cityError() : '': ''} </p> ) }
-
-    // const renderInputCityForm = () => {
-    //     return (
-    //         <form onSubmit={handleClick}>
-    //             <input type="text" placeholder = "City (default: Toronto)" value={id} onChange={e => setId(e.target.value.substr(0, 30)) }/>
-    //             <button type="submit" >Search {id}</button>
-    //         </form>
-    //     )
-    // }
-
 
     const renderSelectCityForm = () => {
         return (
@@ -91,18 +70,6 @@ export const DataCityFetchRefine = () => {
         )
     }
 
-    // const options = () => {
-    //  return (
-    //      [
-    //         {value: 'Toronto', label: 'Toronto'},
-    //         {value: 'Montreal', label: 'Montreal'},
-    //         {value: 'Vancouver', label: 'Vancouver'}
-    //     ]
-    //  )
-    // }
-
-
-
     const renderApplyButton = () => {
         return (
             <form className='button-apply' onSubmit={handleClick}>
@@ -112,7 +79,6 @@ export const DataCityFetchRefine = () => {
     }
 
     const renderForecast = () => {
-
         return(
             <div className='Gallery' aria-label="Weather Forecast">
                 {forecast.map(dayWeather => <div  className='card' key={dayWeather.moonrise_ts}>
@@ -126,7 +92,6 @@ export const DataCityFetchRefine = () => {
                     </div>
                 </div>)
                 }
-
             </div>
         )
     }
@@ -139,16 +104,17 @@ export const DataCityFetchRefine = () => {
     }
 
     return (
+        <div className='app-wrapper'>
+            <label>Weather Forrecast</label>
         <div className='card-wrapper'>
-           <h4><label>Canadian City Weather</label></h4>
-
+           <label>City</label>
             {renderSelectCityForm()}
             {renderCityError()}
             {renderForecast()}
             {renderApplyButton()}
         </div>
+        </div>
     )
-
 
 }
 
